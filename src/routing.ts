@@ -5,18 +5,31 @@ const routes = express.Router();
 
 routes.get("/cart-items", (req, res) => {
     res.status(200);
+    let filteredCart = cartItems; // allows for multiple queries
     if(req.query.maxPrice) {
-        res.json(cartItems.filter(item => item.price >= Number(req.query.maxPrice)));
-    } else if (req.query.prefix) {
+        // query filters out prices over chosen number. Less than maxPrice
+        filteredCart = cartItems.filter(item => item.price <= Number(req.query.maxPrice));
+
+    } 
+    if (req.query.prefix) {
+        // only products that start with given prefix will return
         let prefix: any = req.query.prefix;
-        res.json(cartItems.filter(item => item.product.includes(prefix)));
-    } else if (req.query.pageSize) {
+        filteredCart = cartItems.filter(item => item.product.startsWith(prefix));
+        // res.json(cartItems.filter(item => item.product.includes(prefix)));
+        /** original code ^^^ ****/
+
+    } 
+    if (req.query.pageSize) {
+        // only returns the amount of items in array to match page size. 1:1
         let pageSize: any = req.query.pageSize;
-        cartItems.length = pageSize;
-        res.json(cartItems)    
-    } else {
-        res.json(cartItems)
-    }
+        filteredCart = cartItems.length = pageSize;
+        res.json(filteredCart)    
+        /***  or use .slice(0, Number(pageSize)) ***/
+
+    } 
+        // no queries will return the whole array
+        res.json(filteredCart)
+    
     
 })
 
