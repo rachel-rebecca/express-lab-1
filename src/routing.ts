@@ -34,7 +34,7 @@ routes.get("/cart-items", (req, res) => {
 })
 
 routes.get("/cart-items/:id", (req, res) => {
- 
+    // turn params.id into a number
     let productId: number = Number(req.params.id);
     let foundProduct = cartItems.find(item => item.id === productId);
     if (foundProduct){
@@ -42,15 +42,42 @@ routes.get("/cart-items/:id", (req, res) => {
         res.json(foundProduct);
     } else {
         res.status(404);
-        res.json({"error": `${req.params.id} Not Found`});
+        res.json(`${req.params.id} Not Found`);
     }
 
 }) 
 
+let uniqueId = cartItems.length + 1;
 routes.post("/cart-items", (req, res) => {
+    
+    const newItem = req.body;
+    newItem.id = Number(`${uniqueId}${uniqueId}${uniqueId}`); // I want to keep my ids consistent   
+    uniqueId++;
+
+    cartItems.push(newItem);
     res.status(201);
-    res.json()
-    console.log(req.body)
+    res.json(newItem);
+})
+
+routes.put("/cart-items/:id", (req, res) => {
+    let newItem = req.body;
+    let productId: number = Number(req.params.id);
+
+    let foundIndex = cartItems.findIndex(item => item.id === productId);
+
+    cartItems[foundIndex] = newItem;
+    res.status(200);
+    res.json(newItem);
+
+})
+
+routes.delete("/cart-items/:id", (req, res) => {
+    let productId: number = Number(req.params.id);
+    let index = cartItems.findIndex(item => item.id === productId);
+    // go to found index and remove one item 
+    cartItems.splice(index, 1);
+
+    res.sendStatus(204); // sendStatus does not time out
 })
 
 export default routes;
